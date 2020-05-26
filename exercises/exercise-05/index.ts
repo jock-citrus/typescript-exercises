@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { PersonTypeEnum } from '../utils';
 
 /*
 
@@ -10,8 +11,8 @@ Intro:
 Exercise:
 
     Fix typing for the filterPersons so that it can filter users
-    and return User[] when personType='user' and return Admin[]
-    when personType='admin'. Also filterPersons should accept
+    and return User[] when personType=PersonTypeEnum.user and return Admin[]
+    when personType=PersonTypeEnum.admin. Also filterPersons should accept
     partial User/Admin type according to the personType.
 
 Higher difficulty bonus exercise:
@@ -34,49 +35,100 @@ Run:
 */
 
 interface User {
-    type: 'user';
-    name: string;
-    age: number;
-    occupation: string;
+  type: PersonTypeEnum.user;
+  name: string;
+  age: number;
+  occupation: string;
 }
 
 interface Admin {
-    type: 'admin';
-    name: string;
-    age: number;
-    role: string;
+  type: PersonTypeEnum.admin;
+  name: string;
+  age: number;
+  role: string;
 }
 
 type Person = User | Admin;
 
 const persons: Person[] = [
-    { type: 'user', name: 'Max Mustermann', age: 25, occupation: 'Chimney sweep' },
-    { type: 'admin', name: 'Jane Doe', age: 32, role: 'Administrator' },
-    { type: 'user', name: 'Kate Müller', age: 23, occupation: 'Astronaut' },
-    { type: 'admin', name: 'Bruce Willis', age: 64, role: 'World saver' },
-    { type: 'user', name: 'Wilson', age: 23, occupation: 'Ball' },
-    { type: 'admin', name: 'Agent Smith', age: 23, role: 'Anti-virus engineer' }
+  {
+    type: PersonTypeEnum.user,
+    name: 'Max Mustermann',
+    age: 25,
+    occupation: 'Chimney sweep',
+  },
+  {
+    type: PersonTypeEnum.admin,
+    name: 'Jane Doe',
+    age: 32,
+    role: 'Administrator',
+  },
+  {
+    type: PersonTypeEnum.user,
+    name: 'Kate Müller',
+    age: 23,
+    occupation: 'Astronaut',
+  },
+  {
+    type: PersonTypeEnum.admin,
+    name: 'Bruce Willis',
+    age: 64,
+    role: 'World saver',
+  },
+  { type: PersonTypeEnum.user, name: 'Wilson', age: 23, occupation: 'Ball' },
+  {
+    type: PersonTypeEnum.admin,
+    name: 'Agent Smith',
+    age: 23,
+    role: 'Anti-virus engineer',
+  },
 ];
 
 function logPerson(person: Person) {
-    console.log(
-        ` - ${chalk.green(person.name)}, ${person.age}, ${person.type === 'admin' ? person.role : person.occupation}`
-    );
+  console.log(
+    ` - ${chalk.green(person.name)}, ${person.age}, ${
+      person.type === PersonTypeEnum.admin ? person.role : person.occupation
+    }`
+  );
 }
 
-function filterPersons(persons: Person[], personType: string, criteria: unknown): unknown[] {
-    return persons
-        .filter((person) => person.type === personType)
-        .filter((person) => {
-            let criteriaKeys = Object.keys(criteria) as (keyof Person)[];
-            return criteriaKeys.every((fieldName) => {
-                return person[fieldName] === criteria[fieldName];
-            });
-        });
+function getObjectKeys<O>(obj: O): (keyof O)[] {
+  return Object.keys(obj) as (keyof O)[];
 }
 
-let usersOfAge23: User[] = filterPersons(persons, 'user', { age: 23 });
-let adminsOfAge23: Admin[] = filterPersons(persons, 'admin', { age: 23 });
+type FilterCriteria<T> = Partial<Omit<T, 'type'>>;
+
+function filterPersons(
+  persons: Person[],
+  personType: PersonTypeEnum.user,
+  criteria: FilterCriteria<Admin>
+): User[];
+function filterPersons(
+  persons: Person[],
+  personType: PersonTypeEnum.admin,
+  criteria: FilterCriteria<User>
+): Admin[];
+function filterPersons(
+  persons: Person[],
+  personType: PersonTypeEnum.user | PersonTypeEnum.admin,
+  criteria: FilterCriteria<Person>
+): Person[] {
+  return persons
+    .filter((person) => person.type === personType)
+    .filter((person) => {
+      let criteriaKeys = getObjectKeys(criteria);
+      return criteriaKeys.every((fieldName) => {
+        return person[fieldName] === criteria[fieldName];
+      });
+    });
+}
+
+let usersOfAge23: User[] = filterPersons(persons, PersonTypeEnum.user, {
+  age: 23,
+});
+let adminsOfAge23: Admin[] = filterPersons(persons, PersonTypeEnum.admin, {
+  age: 23,
+});
 
 console.log(chalk.yellow('Users of age 23:'));
 usersOfAge23.forEach(logPerson);
