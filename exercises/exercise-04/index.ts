@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { PersonTypeEnum } from '../utils';
 
 /*
 
@@ -32,14 +33,14 @@ Run:
 */
 
 interface User {
-  type: 'user';
+  type: PersonTypeEnum.user;
   name: string;
   age: number;
   occupation: string;
 }
 
 interface Admin {
-  type: 'admin';
+  type: PersonTypeEnum.admin;
   name: string;
   age: number;
   role: string;
@@ -49,45 +50,47 @@ type Person = User | Admin;
 
 const persons: Person[] = [
   {
-    type: 'user',
+    type: PersonTypeEnum.user,
     name: 'Max Mustermann',
     age: 25,
     occupation: 'Chimney sweep',
   },
   {
-    type: 'admin',
+    type: PersonTypeEnum.admin,
     name: 'Jane Doe',
     age: 32,
     role: 'Administrator',
   },
   {
-    type: 'user',
+    type: PersonTypeEnum.user,
     name: 'Kate Müller',
     age: 23,
     occupation: 'Astronaut',
   },
   {
-    type: 'admin',
+    type: PersonTypeEnum.admin,
     name: 'Bruce Willis',
     age: 64,
     role: 'World saver',
   },
   {
-    type: 'user',
+    type: PersonTypeEnum.user,
     name: 'Wilson',
     age: 23,
     occupation: 'Ball',
   },
   {
-    type: 'admin',
+    type: PersonTypeEnum.admin,
     name: 'Agent Smith',
     age: 23,
     role: 'Administrator',
   },
 ];
 
-const isAdmin = (person: Person): person is Admin => person.type === 'admin';
-const isUser = (person: Person): person is User => person.type === 'user';
+const isAdmin = (person: Person): person is Admin =>
+  person.type === PersonTypeEnum.admin;
+const isUser = (person: Person): person is User =>
+  person.type === PersonTypeEnum.user;
 
 function logPerson(person: Person) {
   let additionalInformation: string = '';
